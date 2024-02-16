@@ -1,7 +1,213 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">Jacqueline Perez and Nakul Srikanth</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>In this homework, we discovered sampling and anti-aliasing techniques and implemented them to rasterize images. We also implemented transforms, baycentric coordinates, and texturing via mipmap.</p>
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+
+<p>To rasterize triangles, we use 2-nested for-loops to iterate through our 2D pixel grid (min(x,y) x max(x,y)) outside our triangle. In the inner most for loop we 
+  perform a conditional check to see whether a point is within the triangle formed by the 3-coordinates passed into 
+  RasterizerImp::rasterize_triangle(). We also offset points by (+0.5, +0.5) to check the middle of the pixel. 
+  Taking into account the winding order of the vertices, we checked both the clockwise and counterclockwise order of the triangle 
+  by switching the order of the vertices when constructing the inside traiangle check. Finally, we call rasterize_point when we 
+  have a point that is inside the traiangle thus, filling all pixels within the triangles with colors.</p>
+
+<p>Our algorithm is no worse than one that checks each sample within the bounding box of the triangle because it does exactly that  </P>
+
+<div align="middle">
+  <img src="images/p1test4.png" align="middle" width="600px"/>
+  <figcaption align="middle"> basic/test4.svg with default viewing paramters and the pixel inspector centered on
+    two edges of the red triangle.</figcaption>
+</div>
+
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+<p>Super sampling algorithm is very similar to Task 1 in that we use the 2-nested for-loops to iterate through our 2D pixel grid. 
+  What does differ however, is the addition of another 2-nested for-loops to check our sqrt(sample_size) x sqrt(sample_size) grid 
+  within each pixel. In the resolve_to_framebuffer function, we added code to iterate through each pixel and each of the subpixels to take 
+  compute the avg color in the sqrt(sample_size) x sqrt(sample_size) grid, to assign to our supersampled pixel.
+  Super sampling is useful as it allows us to obtain more detail by creating a high resolution version of our rasterized image and use this 
+  to blur sharp lines and remove jaggies.
+</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/p2test4sr1.png" align="middle" width="350px"/>
+        <figcaption align="middle">basic/test4.svg with sample rate 1.</figcaption>
+      </td>
+      <td>
+        <img src="images/p2test4sr4.png" align="middle" width="350px"/>
+        <figcaption align="middle">basic/test4.svg with sample rate 4.</figcaption>
+      </td>
+      <td>
+        <img src="images/p2test4sr16.png" align="middle" width="350px"/>
+        <figcaption align="middle">basic/test4.svg with sample rate 16.</figcaption>
+      </td>
+    </tr>
+    <br>
+
+  </table>
+</div>
+
+
+
+<h3 align="middle">Part 3: Transforms</h3>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/Task3.png" align="middle" width="500px"/>
+        <figcaption align="middle">Robot Transform: Robot standing on a soccer ball, giving directions to a teammate.</figcaption>
+      </td>
+    </tr>
+    <br>
+
+  </table>
+</div>
+
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+<p>
+  In the case of a triangle, Barycentric cordinates are 3 coordinates, alpha, beta, and gamma, that specify the position
+  of a point relative the triangle's vertices. It essentially describes the weight or influence each vertice has on a point in
+  the triangle, thus the three coordinates add up to 1. This makes Barycentric coordinates ideal to interpolate since we are able to
+  get the relative contribution of each vertice and blend values.
+
+</p>
+
+<div align="middle">
+  <img src="images/BCexample.png" align="middle" width="600px"/>
+  <figcaption align="middle"> Example of Barycentric coordinates with a triangle that has vertices VA, AB, and VC. Depicts
+  how Barycentric coordinates can be used to obtain the color contribution of each vertice of the triangle.</figcaption>
+</div>
+
+<div align="middle">
+  <img src="images/p4test7.png" align="middle" width="600px"/>
+  <figcaption align="middle"> basic/test7.svg with default viewing paramters.</figcaption>
+</div>
+
+
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+<p>Pixel sampling is the technique of going over the pixels of an image to modify or process them, 
+  here we use it to perform texture mapping. For this task we incorporated four nested for loops, 
+  the two outermost for loops keep track of the x and y coordinates of the pixels while the two 
+  innermost for loops keep track of the x and y coordinate offsets to enable supersampling and keep 
+  track of the pixel's centerpoints. Within the innermost for loop the barycentric coordinates are 
+  calculated for the vertices of the (x, y) triangle passed into the function and the current point 
+  we are on in the for loop. Then we check if the point lies inside the triangle by ensuring that the 
+  barycentric coordinates are non-negative. We then calculate the (u, v) space coordinate using the 
+  barycentric coordintes obtained from (x, y) triangle to scale it from (x, y) to (u, v). Based on 
+  the pixel sampling method(psm) chosen the (u, v) coordinate is then either passed into sample_nearest() 
+  or sample_bilinear(). Nearest sampling is essentially taking the mapped (u, v) coordinate and finding it's 
+  nearest neighbor or closest pixel from the original image and matching its color/texture. While bilinear 
+  pixel sampling takes into account the four nearest neighbor pixels and interpolates its color values 
+  according to their respective distances from the sampling point and the point is then assigned to the 
+  resulting color. Nearest sampling images tend to appear more jagged than bilinear sampled images. 
+  The color value returned from either one of these functions is then passed into the rasterize_point 
+  function along with its cooresponding (x, y) coordinate (with its offsets added on). This then results 
+  in a texture mapped image.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/Task5-1.png" align="middle" width="400px"/>
+        <figcaption align="middle">P_NEAREST - SuperSample Rate = 1</figcaption>
+      </td>
+      <td>
+        <img src="images/Task5-2.png" align="middle" width="400px"/>
+        <figcaption align="middle">P_NEAREST - SuperSample Rate = 16</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/Task5-3.png" align="middle" width="400px"/>
+        <figcaption align="middle">P_BILINEAR - SuperSample Rate = 1</figcaption>
+      </td>
+      <td>
+        <img src="images/Task5-4.png" align="middle" width="400px"/>
+        <figcaption align="middle">P_BILINEAR - SuperSample Rate = 16</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+<p>Level sampling is a technique used in texture mapping where we store textures in 
+  multiple resolutions(levels) with the lowest level consisting of the highest resolution and subsequent higher levels
+decreasing in resolution by a factor of 2. For L_ZERO we assume that the level is 0 and sample from the full resolution of a texmap.
+For L_NEAREST we take a float value as input for the desired level, and we output the average of the ceil() and floor() of the input 
+level as the level of the texmap. And for L_LINEAR we take the weighted sum of the level above and below our desired level. When analyzing 
+trade-offs between various techniques, increasing sample size per pixel increases memory and runtime efficiency, however this produces good
+antialiasing. Sampling pixel using P_NEAREST is more efficient but still produces jaggies, while P_BILINEAR is less efficient and produces a 
+better antialiased output. Increasing levels on level sampling can reduce the information we recieve from sampling, while decreasing levels can 
+produce jaggies. Finding a middle ground for level sampling is best both for efficiency and desireable output. </p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/Task6-1.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_ZERO - P_NEAREST - SuperSample Rate = 1</figcaption>
+      </td>
+      <td>
+        <img src="images/Task6-2.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_ZERO - P_LINEAR - SuperSample Rate = 1</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/Task6-3.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_NEAREST - P_NEAREST - SuperSample Rate = 1</figcaption>
+      </td>
+      <td>
+        <img src="images/Task6-4.png" align="middle" width="400px"/>
+        <figcaption align="middle">L_NEAREST - P_LINEAR - SuperSample Rate = 1</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
 </html>
