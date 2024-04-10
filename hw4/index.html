@@ -1,7 +1,269 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Nakul Srikanth</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>In this project, I learned a lot about encoding physics to improve graphical models. I utilized mass points and spring properties to encode a mesh 
+  and apply gravity and other objects to handle collisions and provide realisitic simulations of different conditions. I also learned a lot about shaders and gained an introduction to GLSL for encoding shader programs.</p>
+
+<h2 align="middle">Part I: Masses and springs</h2>
+<p>
+  This section of the HW was pretty straighforward. I followed the spec and created a bunch of point masses according to the 2D grid of specified width and height, and num_width_points and num_height points.
+  I then created springs and found the appropriate pairs of point masses that would satisfy a constraint and added them to the mass-spring system.
+  Overall, pretty straighforward and thoroughly followed the spec.
+</p>
+<br>
+
+<div align="middle">
+  <img src="images/Task1-1.png" align="middle" width="50%">
+  <figcaption align="middle">wireframe with ALL constraints</figcaption>
+</div>
+<br>
+<div align="middle">
+  <img src="images/Task1-2.png" align="middle" width="50%">
+  <figcaption align="middle"> wireframe without shearing constraints</figcaption>
+</div>
+<br>
+<div align="middle">
+  <img src="images/Task1-3.png" align="middle" width="50%">
+  <figcaption align="middle"> wireframe with only shearing constraint</figcaption>
+</div>
+<br>
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+<p>
+  This section of the programming assignment was pretty straighforward as we were just handling some basic physics formulas and principles.
+</p>
+
+<p>
+  While experimenting with the simulations, I found that increasing (ks) would make the cloth more stiff, while decreasing (ks) would make it more
+  smooth and conforming and fall faster to the ground. Increasing the density, on the other hand, makes the cloth feel more loose and creates wrinkles, while 
+  decreasing the density tends to make the cloth more stiff and less conforming to drop. Increasing damping creates stronger forces within the cloth and reduces
+  its ability to change quickly and react to the drop, while decreasing damping makes the cloth bounce more and make it more springy.
+</p>
+
+<div align="middle">
+  <img src="images/Task2-1.png" align="middle" width="50%">
+  <figcaption align="middle"> final resting state of scene/pinned4.json cloth (wireframe)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task2-2.png" align="middle" width="50%">
+  <figcaption align="middle"> final resting state of scene/pinned4.json cloth (normal shading)</figcaption>
+</div>
+<br>
+
+<h2 align="middle">Part III: Handling collisions with other objects</h2>
+<p>
+  To handle collisions with objects, I filled out the respective collide() functions to check if a collision occured between and object 
+  and a point mass. For the sphere, I check if the point-mass is on or inside the sphere and bumped the point to its tangent point where the intersection occured.
+  For the plane, I calculated the ray between the point-mass and the plane and checked whether the ray intersects the point from the previous timestep. 
+  I used this to determine if the cloth intersects the plane and bumped it to stay on the plane.
+</p>
+<br>
+
+<div align="middle">
+  <img src="images/Task3-1.png" align="middle" width="50%">
+  <figcaption align="middle"> shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task3-2.png" align="middle" width="50%">
+  <figcaption align="middle"> shaded cloth from scene/sphere.json in its final resting state on the sphere using the ks = 500</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task3-3.png" align="middle" width="50%">
+  <figcaption align="middle"> shaded cloth from scene/sphere.json in its final resting state on the sphere using the ks = 50000</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task3-4.png" align="middle" width="50%">
+  <figcaption align="middle"> shaded cloth lying peacefully at rest on the plane</figcaption>
+</div>
+<br>
+
+
+<h2 align="middle">Part IV: Handling self-collisions</h2>
+<p>
+  Pretty similar to previous parts. Implemented by following the spec document and was very straightforward. The key in implementing this 
+  was using a C++ Map data structure to parse point-masses to given 3D bounding boxes. This was done via hashing and stored as a list of point_masses
+  in the given bounding box hash. And then, we check if two point masses from different bounding box collides and we bump them respectively to avoid collision by 2*thickness.
+</p>
+
+<div align="middle">
+  <img src="images/Task4-1.png" align="middle" width="50%">
+  <figcaption align="middle"> self collision of cloth (initial stage)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-2.png" align="middle" width="50%">
+  <figcaption align="middle"> self collision of cloth (moment of first collision)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-3.png" align="middle" width="50%">
+  <figcaption align="middle"> self collision of cloth (final state)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-4.png" align="middle" width="50%">
+  <figcaption align="middle"> self collsion of cloth (ks = 500); cloth is very shriveled</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-5.png" align="left" width="50%">
+  <img src="images/Task4-6.png" align="right" width="50%">
+  <figcaption align="middle"> self collsion of cloth (ks = 50000); Cloth is resistant to self collision (shown in 2 different angles)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-7.png" align="middle" width="50%">
+  <figcaption align="middle"> self collsion of cloth (density = 1); Cloth is very light and bends easily but does not fold on it self that much</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task4-8.png" align="middle" width="50%">
+  <figcaption align="middle"> self collsion of cloth (density = 150); Cloth is very stiff and crumples very easily</figcaption>
+</div>
+<br>
+
+<h2 align="middle">Part V: Shaders</h2>
+<p>
+  Shaders are programs that render scenes much faster, and in parallel using GPU, compared to normal raytracing computations on CPU. 
+  Vertex Shaders calculate the geometric properties and output a final position. Fragment Shaders take in geometric attributes output from
+  the vertex shader and output a 4-dimensional vector of color.
+</p>
+
+<p>
+  Shaders are programs that render scenes much faster, and in parallel using GPU, compared to normal raytracing computations on CPU. 
+  Vertex Shaders calculate the geometric properties and output a final position. Fragment Shaders take in geometric attributes output from
+  the vertex shader and output a 4-dimensional vector of color.
+</p>
+
+<p>
+  The Blinn-Phong model provides an addition of both ambient and specular light to diffuse lighting to provide a matte and shiny look for a given surface.
+  We model this by varying the constants ks and p in the Blinn-Phong model equation. A higher ks is attributed to a stonger focus of light on a given surface, 
+  while a lower ks distributes light evenly and doesn't have a strong reflection of light. A higher value of p can smooth a surface and give it a more shiny look,
+  while a smaller value of p can make it more blurry and give a fuzzy look.
+</p>
+
+<div align="middle">
+  <img src="images/Task5-1.1.png" align="middle" width="50%">
+  <figcaption align="middle"> only Ambient</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-1.2.png" align="middle" width="50%">
+  <figcaption align="middle"> only Diffuse</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-1.3.png" align="middle" width="50%">
+  <figcaption align="middle"> only Specular</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-2.png" align="middle" width="50%">
+  <figcaption align="middle"> entire Blinn-Phong model</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-3.png" align="middle" width="50%">
+  <figcaption align="middle"> Simple cloth texture</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-3.1.png" align="middle" width="50%">
+  <figcaption align="middle"> Simple cloth texture (-o 16 -a 16); Since the sphere is jagged the cloth is less conforming to the shape of the sphere and is looking more rugged</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-3.2.png" align="middle" width="50%">
+  <figcaption align="middle"> Simple cloth texture (-o 128 -a 128); Since the sphere is more round and smooth, the cloth flows over more naturally and emobies the shape of the sphere</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-4.1.png" align="middle" width="50%">
+  <figcaption align="middle">Bump sphere (without cloth)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-4.2.png" align="middle" width="50%">
+  <figcaption align="middle"> Bump sphere (with cloth)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-4.3.png" align="middle" width="50%">
+  <figcaption align="middle"> Displacement sphere (without cloth)</figcaption>  
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-4.4.png" align="middle" width="50%">
+  <figcaption align="middle"> Displacement sphere (with cloth)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-5.1.png" align="middle" width="50%">
+  <figcaption align="middle"> Mirror sphere (without cloth)</figcaption>
+</div>
+<br>
+
+<div align="middle">
+  <img src="images/Task5-5.2.png" align="middle" width="50%">
+  <figcaption align="middle"> Mirror sphere (with cloth)</figcaption>
+</div>
+<br>
+
+</body>
 </html>
