@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>Particle Based Fluid Simulation</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Particle Based Fluid Simulation</h1>
+<h2 align="middle">Henry Li, Nakul Srikanth, Aidan Sussman, and Justin Wang</h2>
+
+<!-- Add Website URL -->
+
+<br><br>
+
+
+
+    <img src="images/example_image.png" width="480px" />
+    <figcaption align="middle">Results Caption: my bunny is the bounciest bunny</figcaption>
+
+
+<h2 align="middle">Problem Description</h2>
+<p>
+  We want to create a particle-based fluid simulator that can output animations. Fluid simulations have many applications in aeronautics, hydrodynamics, aerospace, and also just because it looks pleasing. Fluid behavior is difficult to simulate because its behavior is governed by many different interactions and laws, and simulations are at best an approximation for observed behavior. We are going to solve this by applying approximations of laws and behaviors to particles on many discrete timesteps. 
+</p>
+<br>
+
+<h2 align="middle">Goals and Deliverables</h2>
+<div class="goals">
+  <ul>
+      <li>Create a visually accurate and computationally efficient fluid simulation.</li>
+      <li>Develop an interactive demo showcasing various fluid behaviors under different conditions.</li>
+      <li>Measure performance improvements over our own methods using quantitative benchmarks, to ensure it runs in a reasonable time.</li>
+  </ul>
+  <p><strong>Baseline Plan:</strong> Develop a basic fluid simulator that can handle small-scale simulations efficiently.</p>
+  <p><strong>Aspirational Plan:</strong> Expand the simulator to include interactive elements and real-time changes to simulation parameters.</p>
+</div>
+
+<h2 align="middle"> Schedule</h2>
+        <ul>
+            <li><strong>Week 1-2:</strong> Research and finalize the algorithms and frameworks to be used.</li>
+            <li><strong>Week 3-4:</strong> Begin coding the basic simulation framework, using clothsim or unity as a baseline.</li>
+            <li><strong>Final Week:</strong> Testing, optimization, and preparation for presentation.</li>
+        </ul>
+
+<h2 align="middle"> Resources</h2>
+      <ul>
+          <li><strong>Class Lectures:</strong> lecture 17 which focuses on physical simulation, specifically particle systems and fluids.</li>
+          <li><strong>Past Class Projects:</strong> Specifically, we will use Homework 4: clothsim, as a starting point for developing our fluid simulation. The methods and code structure from this project will serve as a baseline for our initial setup.</li>
+          <li><strong>Academic Papers:</strong>
+              <ul>
+                  <li><a href="http://www.ligum.umontreal.ca/Clavet-2005-PVFS/pvfs.pdf">"Particle-based Viscoelastic Fluid Simulation" by Clavet et al.</a></li>
+                  <li><a href="https://sph-tutorial.physics-simulation.org/pdf/SPH_Tutorial.pdf">"Smoothed Particle Hydrodynamics (SPH) Tutorial"</a></li>
+                  <li><a href="https://web.archive.org/web/20140725014123/https://docs.nvidia.com/cuda/samples/5_Simulations/particles/doc/particles.pdf">"NVIDIA CUDA Samples: Particles"</a></li>
+              </ul>
+          </li>
+      </ul>
+</body>
+</html>
