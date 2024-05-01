@@ -1,7 +1,129 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 3 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>CS 184 Pathtracer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Project 3: Pathtracer</h1>
+<h2 align="middle">Nakul Srikanth</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+    In this homework, I gained an overview on the ray tracing algorithm works and how ray-sphere intersections and ray-traingle intersections are programatically calculated.
+	I also learned how to global illumination works and the various lighting principles behind that. In addition, I learned how to utilize a new form of data structure, the BVH Tree 
+	to enable a more efficient ray tracing algorithm.
+</p>
+<br>
+
+
+<h2 align="middle">Part 1: Ray Generation and Scene Intersection</h2>
+
+<p>
+    We loop through every pixel to first transform the normalized image coordinates into the camera space to generate rays in the camera. Then you transform that into the world frame. 
+	You utilize the cameara origin as the place where rays are generated and find the coordinates where rays reach the sensor plane in terms of world coordinates.
+	We use these rays to test for triangle and sphere intersection. 
+	For triangle and sphere intersection, I utilized the formulas from lecture (Moller-Trumbore & quadratic formula) respectively, for triangle and sphere intersections.
+	As per the spec, we update max_t to be the intersecting t value.
+  </p>
+<br>
+
+<div align="middle">
+  <img src="images/Task1-1.png" align="middle" width="50%">
+</div>
+<br>
+
+<div align="middle">
+	<img src="images/Task1-2.png" align="middle" width="50%">
+  </div>
+ <br>
+
+
+<h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
+
+<p>
+    BVH Tree construction was pretty straightforward in that we utilize tree-recursion to assign left and right pointers for inner-nodes. And for leaf nodes, we just set the start and end pointers for the 
+	primatives and leave the left and right pointers null. We determine if a node is a leaf node if the number of primatives is less than the max_leaf_size. For inner-nodes we use the BBox's extent to determine the split axis
+	and split the primatives based on its centroids and extent value for that split axis. 
+	For has_intersection and intersection we check if the BBox has an intersection with the ray and its times t0 and t1,
+	and if so we handle the logic for leaf nodes and inner nodes and return a boolean value accordingly using recursion.
+	We ensure that the has_intersection function short-circuits, while the intersction function records where the intersection occurs and then returns a boolean value.
+</p>
+<br>
+
+<div align="middle">
+  <img src="images/Task2-1.png" align="middle" width="50%">
+</div>
+<br>
+
+<div align="middle">
+	<img src="images/Task2-2.png" align="middle" width="50%">
+  </div>
+<br>
+
+<p>
+    The Max Planck rendering took 102 seconds without BVH and 0.3085 seconds with BVH.
+	The Lucy rendering took 210 seconds without BVH and 0.3087 seconds with BVH.
+	The major improvement in rendering times can be attributed to the fact that if a Ray does not 
+	intersect with the root of the BVH tree, we simply ignore all the tedious calculations and just move on
+	to the next ray or pixel.
+</p>
+<br>
+
+
+<h2 align="middle">Part 3: Direct Illumination</h2>
+
+<p>
+   I achieved diffuse bsdf by taking the reflectance and dividing it by PI. And for Zero Bounce illumination, I 
+   checked if the primative intersected with the ray, if it did intersect then I returned the emissive spectrum of the object,
+   if not I returned 0. And I changed PathTracer::est_radiance_global_illumination to return zero bounce illumination instead of normal.
+</p>
+
+<br>
+
+<br>
+<div align="middle">
+  <img src="images/Task3-1.png" align="middle" width="50%">
+</div>
+<br>
+</body>
 </html>
